@@ -1,8 +1,7 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:painter/painter.dart';
+
+import 'painter.dart';
 
 class PaintingPage extends StatefulWidget {
   const PaintingPage({
@@ -11,21 +10,20 @@ class PaintingPage extends StatefulWidget {
   });
 
   @override
-  _PaintingPageState createState() => _PaintingPageState();
+  PaintingPageState createState() => PaintingPageState();
 
   final String url;
 }
 
-class _PaintingPageState extends State<PaintingPage> {
-  bool _finished = false;
-  PainterController _controller = _Controller();
+class PaintingPageState extends State<PaintingPage> {
+  final PainterController _controller = controller();
 
   @override
   void initState() {
     super.initState();
   }
 
-  static PainterController _Controller() {
+  static PainterController controller() {
     PainterController controller = PainterController();
     controller.thickness = 1.0;
     controller.backgroundColor = Colors.transparent;
@@ -36,41 +34,45 @@ class _PaintingPageState extends State<PaintingPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> actions;
-    if (_finished) {
-      actions = <Widget>[
-        IconButton(
-          icon: const Icon(Icons.content_copy),
+    // if (_finished) {
+    //   actions = <Widget>[
+    //     IconButton(
+    //       icon: const Icon(Icons.content_copy),
+    //       color: Colors.blue.shade900,
+    //       tooltip: 'New Painting',
+    //       onPressed: () => setState(() {
+    //         _finished = false;
+    //         _controller = controller();
+    //       }),
+    //     ),
+    //   ];
+    // }
+    actions = <Widget>[
+      IconButton(
+          icon: const Icon(
+            Icons.undo,
+          ),
+          tooltip: 'Undo',
           color: Colors.blue.shade900,
-          tooltip: 'New Painting',
-          onPressed: () => setState(() {
-            _finished = false;
-            _controller = _Controller();
+          onPressed: () {
+            if (!_controller.isEmpty) {
+              _controller.undo();
+            }
           }),
-        ),
-      ];
-    } else {
-      actions = <Widget>[
-        IconButton(
-            icon: const Icon(
-              Icons.undo,
-            ),
-            tooltip: 'Undo',
-            color: Colors.blue.shade900,
-            onPressed: () {
-              if (!_controller.isEmpty) {
-                _controller.undo();
-              }
-            }),
-        IconButton(
-            icon: const Icon(Icons.delete),
-            tooltip: 'Clear',
-            color: Colors.blue.shade900,
-            onPressed: _controller.clear),
-        // IconButton(
-        //     icon: const Icon(Icons.check),
-        //     onPressed: () => _show(_controller.finish(), context)),
-      ];
-    }
+      IconButton(
+        icon: const Icon(Icons.delete),
+        tooltip: 'Clear',
+        color: Colors.blue.shade900,
+        onPressed: _controller.clear,
+      ),
+      // IconButton(
+      //     icon: const Icon(Icons.check),
+      //     onPressed: () => _show(_controller.finish(), context)),
+    ];
+
+    TransformationController _zoomTransformationController =
+        TransformationController();
+
     return Scaffold(
       backgroundColor: Colors.blueGrey,
       appBar: AppBar(
@@ -91,8 +93,9 @@ class _PaintingPageState extends State<PaintingPage> {
           child: AspectRatio(
             aspectRatio: 1.0,
             child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                child: Painter(_controller)),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Painter(_controller),
+            ),
           ),
         ),
       ),
@@ -182,13 +185,13 @@ class DrawBar extends StatelessWidget {
 class ColorPickerButton extends StatefulWidget {
   final PainterController _controller;
 
-  ColorPickerButton(this._controller);
+  const ColorPickerButton(this._controller, {super.key});
 
   @override
-  _ColorPickerButtonState createState() => _ColorPickerButtonState();
+  ColorPickerButtonState createState() => ColorPickerButtonState();
 }
 
-class _ColorPickerButtonState extends State<ColorPickerButton> {
+class ColorPickerButtonState extends State<ColorPickerButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(

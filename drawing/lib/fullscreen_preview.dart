@@ -16,10 +16,14 @@ class FullscreenPreview extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.blueGrey.shade700,
       ),
-      body: Center(
-        child: Image.asset(
-          url,
-          fit: BoxFit.fitWidth,
+      body: InteractiveViewer(
+        minScale: 1,
+        maxScale: 4,
+        child: Center(
+          child: Image.asset(
+            url,
+            fit: BoxFit.fitWidth,
+          ),
         ),
       ),
     );
